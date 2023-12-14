@@ -3,24 +3,52 @@ run-name: ¡Haciendo reto 2!
 on:
     push:
         branches:
-            - 'aprendiendo-github-actions'
-        paths:
-            - 'hola_mundo.py'
+            - aprendiendo-github-actions
     pull_request:
-            types:
-                - reopened
+            types: [opened, synchronize, reopened]
+            paths:
+              - '**.py'
     issue_comment:
         types: deleted
+    workflow_dispatch:
+      inputs:
+        lenguaje_favorito:
+          description: 'Lenguaje favorito'
+          default: Pyhton
+          required: true
+          type: choice
+          options:
+            - Python
+            - Rust
+            - Go
+        nombre:
+          description: 'Tu nombre'
+          default: Luis
+          type: string
 jobs:
-    hola-mundo:
-        runs-on: macos-latest
+    hola-mundo-manual:
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Set variable
-              run: echo "USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+            - name: Definir nombre
+              run: echo "NAME=${{ inputs.nombre }}" >> $GITHUB_ENV
+            - name: Definir lenguaje
+              run: echo "LANGUAGE=${{ inputs.lenguaje_favorito }}" >> $GITHUB_ENV
             - name: Set-up-Python
               uses: actions/setup-python@v4
               with:
                 python-version: '3.10'
-            - run: python hola_mundo.py
+            - run: python hola_lenguaje.py
+    hola-mundo:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Definir variable
+          run: echo "USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+        - name: Set-up-Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.10'
+        - run: python hola_mundo.py
